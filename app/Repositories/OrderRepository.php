@@ -8,6 +8,7 @@ use App\Models\Scopes\OrderFilterStatusScope;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class OrderRepository implements OrderInterface
 {
@@ -30,7 +31,7 @@ class OrderRepository implements OrderInterface
 
                 return $order->load('items');
             });
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::error('Order creation failed: ' . $e->getMessage());
 
             return null;

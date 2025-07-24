@@ -7,6 +7,7 @@ use App\Models\Order;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class UpdateOrderStatusJob implements ShouldQueue
 {
@@ -16,24 +17,23 @@ class UpdateOrderStatusJob implements ShouldQueue
     {
         $orders = Order::whereIn('status', [Order::PENDING, Order::SHIPPED])->get();
 
-        event(new OrderStatusUpdated($orders[0], 'pending'));
+        foreach ($orders as $order) {
 
-//        foreach ($orders as $order) {
-//            $response = Http::get('https://external-api.com/status', [
-//                'order_number' => $order->order_number,
-//            ]);
-//
-//            if ($response->ok()) {
-//                $data = $response->json();
-//
-//                if (isset($data['status']) && $data['status'] !== $order->status) {
-//                    $oldStatus = $order->status;
-//                    $order->status = $data['status'];
-//                    $order->save();
-//
-//                    event(new OrderStatusUpdated($order, $oldStatus));
-//                }
-//            }
-//        }
+            $response = Http::get('http://127.0.0.1:8001/api/external-api/status/' . $order->id);
+
+            if ($response->ok()) {
+                $data = $response->json();
+
+                if (isset($data['status']) && $data['status'] !== $order->status) {
+                    $oldStatus = $order->status;
+                    $order->status = $data['status'];
+                    $order->save();
+
+                    event(new OrderStatusUpdated($order, $oldStatus));
+                }
+            } else {
+                Log::error('Failed to fetch status for order ID ' . $order->id . '. HTTP status: ' . $response->status());
+            }
+        }
     }
 }

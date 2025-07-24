@@ -5,6 +5,7 @@ namespace App\Models;
 use Database\Factories\OrderFactory;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -28,6 +29,8 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|Order whereStatus($value)
  * @method static Builder<static>|Order whereTotalAmount($value)
  * @method static Builder<static>|Order whereUpdatedAt($value)
+ * @property-read Collection<int, OrderItem> $items
+ * @property-read int|null $items_count
  * @mixin Eloquent
  */
 class Order extends Model

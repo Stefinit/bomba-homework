@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class OrderCreationTest extends TestCase
@@ -13,7 +12,8 @@ class OrderCreationTest extends TestCase
     public function test_order_creation_with_items()
     {
         $payload = [
-            'order_number' => '55555',
+            'order_number' => '55554',
+            'status' => 'pending',
             'total_amount' => 200.50,
             'items' => [
                 ['product_name' => 'Item 1', 'quantity' => 2, 'price' => 50.00],
@@ -24,14 +24,20 @@ class OrderCreationTest extends TestCase
         $response = $this->postJson('/api/orders', $payload);
 
         $response->assertStatus(201)
-            ->assertJson([
-                'order_number' => '55555',
+            ->assertJsonFragment([
+                'order_number' => '55554',
                 'status' => 'pending',
                 'total_amount' => 200.50,
-            ])
-            ->assertJsonCount(2, 'items');
+            ]);
 
-        $this->assertDatabaseHas('orders', ['order_number' => '55555']);
+        $items = $response->json('data.items');
+        $this->assertIsArray($items);
+        $this->assertCount(2, $items);
+
+        $this->assertDatabaseHas('orders', ['order_number' => '55554']);
         $this->assertDatabaseHas('order_items', ['product_name' => 'Item 1']);
     }
+
+
+
 }

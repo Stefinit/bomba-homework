@@ -9,7 +9,7 @@ class Kernel extends ConsoleKernel
 {
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('orders:update-status')->everyFiveMinutes();
+        $schedule->command('orders:update-status')->everyMinute();
     }
 
     protected function commands()

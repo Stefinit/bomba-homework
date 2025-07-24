@@ -3,20 +3,22 @@
 namespace Tests\Feature;
 
 use App\Events\OrderStatusUpdated;
+use App\Jobs\UpdateOrderStatusJob;
 use App\Models\Order;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class OrderStatusUpdateTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_order_status_is_updated_and_event_fired()
     {
         Event::fake();
         Http::fake([
-            'external-api.com/status*' => Http::response([
+            'http://127.0.0.1:8001/api/external-api/status/1' => Http::response([
                 'order_number' => 'ORDER999',
                 'status' => 'shipped',
             ], 200),
@@ -28,7 +30,6 @@ class OrderStatusUpdateTest extends TestCase
             'total_amount' => 100.0,
         ]);
 
-        // Запускаем джобу, которая должна обновить статус
         (new UpdateOrderStatusJob())->handle();
 
         $order->refresh();
