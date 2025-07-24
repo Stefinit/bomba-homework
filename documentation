@@ -1,0 +1,6 @@
+For documentation I used Swagger
+- http://localhost:8000/api/documentation
+
+As external API, I use a simple controller, and run 2 servers with php artisan serve.
+http://localhost:8001 serve as external api.
+
